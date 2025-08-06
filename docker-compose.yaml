@@ -1,0 +1,29 @@
+services: 
+  server:
+    container_name: "anonChat"
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/app
+    env_file:
+      - ./server/.env
+    restart: unless-stopped
+
+
+  client:
+    container_name: "anonChatClient"
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev"]
+    depends_on:
+      - server
+    restart: unless-stopped

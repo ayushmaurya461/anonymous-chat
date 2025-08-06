@@ -1,0 +1,36 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*-test
+*.test
+
+# Go workspace file
+go.work
+
+# IDEs and editors
+.idea/
+*.swp
+*.bak
+*.tmp
+*.log
+
+# Dependency directories
+vendor/
+
+# Environment variables
+.env
+
+# Build artifacts
+/build/
+tmp
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
