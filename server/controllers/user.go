@@ -177,3 +177,88 @@ func GuestLogin(g *gin.Context) {
 		Data:   user,
 	})
 }
+
+func GetUser(g *gin.Context) {
+	id := g.Param("id")
+
+	var user models.User
+	query := `SELECT id, uid, name, email, type, status, created_at FROM users WHERE id = $1`
+	err := db.Conn.QueryRow(context.Background(), query, id).Scan(
+		&user.ID,
+		&user.UID,
+		&user.Name,
+		&user.Email,
+		&user.Type,
+		&user.Status,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		g.JSON(http.StatusNotFound, models.APIResponse{
+			Status: "error",
+			Error:  "User not found",
+		})
+		return
+	}
+
+	g.JSON(http.StatusOK, models.APIResponse{
+		Status: "success",
+		Data:   user,
+	})
+
+}
+
+func GetUsers(g *gin.Context) {
+	id := g.Param("id")
+
+	var users []models.User
+	query := `SELECT id, uid, name, email, type, status, created_at 
+			  FROM users 
+			  WHERE id != $1
+			  ORDER BY created_at DESC`
+
+	rows, err := db.Conn.Query(context.Background(), query, id)
+	if err != nil {
+		g.JSON(http.StatusInternalServerError, models.APIResponse{
+			Status: "error",
+			Error:  "Failed to fetch users: " + err.Error(),
+		})
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(
+			&user.ID,
+			&user.UID,
+			&user.Name,
+			&user.Email,
+			&user.Type,
+			&user.Status,
+			&user.CreatedAt,
+		); err != nil {
+			g.JSON(http.StatusInternalServerError, models.APIResponse{
+				Status: "error",
+				Error:  "Failed to scan user",
+			})
+			return
+		}
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		g.JSON(http.StatusInternalServerError, models.APIResponse{
+			Status: "error",
+			Error:  "Error iterating users",
+		})
+		return
+	}
+
+	g.JSON(http.StatusOK, models.APIResponse{
+		Status: "success",
+		Data:   users,
+	})
+
+}

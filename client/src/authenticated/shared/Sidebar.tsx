@@ -15,8 +15,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { type DirectChat, type Room } from "../../context/ChatContext";
-import { useChatSocket } from "../../api/chats";
+import { type Messages, type Room } from "../../context/ChatContext";
 import { useNavigate } from "react-router-dom";
 import { useChat } from "../../hooks/use-chat";
 import { useAuth } from "../../hooks/use-auth";
@@ -25,11 +24,10 @@ export const Sidebar = () => {
   const [expandedChats, setExpandedChats] = useState(false);
   const [expandedRooms, setExpandedRooms] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { rooms, directs: directChats, setActiveChat, activeChat } = useChat();
+  const { rooms, messages: directChats, setActiveChat, activeChat } = useChat();
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useChatSocket();
   const filteredRooms = rooms.filter((room) =>
     room.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -43,7 +41,7 @@ export const Sidebar = () => {
     if (section === "chats") setExpandedChats(!expandedChats);
   };
 
-  const navigateTo = (chat: Room | DirectChat) => {
+  const navigateTo = (chat: Room | Messages) => {
     setActiveChat(chat);
     navigate("/chat");
   };

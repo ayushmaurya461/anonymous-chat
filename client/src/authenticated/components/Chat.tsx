@@ -1,15 +1,21 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useChat } from "../../hooks/use-chat";
 
 export const Chat = () => {
-  const { activeChat } = useChat();
+  const { activeChat, sendMessage } = useChat();
   const navigate = useNavigate();
+  const [input, setInput] = useState("");
 
   useEffect(() => {
     if (!activeChat) navigate("/");
   });
 
+  const handleSend = () => {
+    if (input.trim() === "") return;
+    sendMessage(input);
+    setInput("");
+  };
 
   return (
     <div className="w-full h-screen overflow-hidden relative">
@@ -21,19 +27,25 @@ export const Chat = () => {
         <button>Hello </button>
         {/* Content here will scroll if needed */}
         <div className="p-4 space-y-4">
-          {Array.from({ length: 100 }, (_, i) => (
+          {Array.from({ length: 10 }, (_, i) => (
             <p key={i}>Chat message {i + 1}</p>
           ))}
         </div>
       </main>{" "}
-      <footer className="absolute bottom-0 w-full bg-white p-3">
+      <footer className="absolute bottom-0 w-full bg-white p-3 flex gap-2">
         <textarea
-          name="message"
-          id="message"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message..."
           rows={1}
           className="w-full p-2 rounded-2xl bg-gray-100 px-6"
-        ></textarea>
+        />
+        <button
+          onClick={handleSend}
+          className="bg-teal-500 text-white px-4 py-2 rounded-2xl"
+        >
+          Send
+        </button>
       </footer>
     </div>
   );

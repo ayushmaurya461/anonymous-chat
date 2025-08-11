@@ -25,3 +25,15 @@ func ConnectDB() error {
 
 	return nil
 }
+
+func GetUsernameByID(id string) string {
+	query := "SELECT name FROM users WHERE id = $1"
+	var username string
+	fmt.Println("QUERY", query, id)
+	err := Conn.QueryRow(context.Background(), query, id).Scan(&username)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(username)
+	return username
+}

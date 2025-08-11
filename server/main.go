@@ -2,6 +2,7 @@ package main
 
 import (
 	"anonChat/db"
+	"anonChat/models"
 	"anonChat/router"
 
 	"github.com/gin-contrib/cors"
@@ -39,7 +40,16 @@ func main() {
 		panic(err)
 	}
 
-	router.SetupRoutes(g)
+	hub := &models.Hub{
+		Clients:    make(map[*models.Client]bool),
+		Broadcast:  make(chan models.WSMessage),
+		Register:   make(chan *models.Client),
+		Unregister: make(chan *models.Client),
+	}
+
+	go hub.Run()
+
+	router.SetupRoutes(g, hub)
 
 	g.Run(":8080")
 
