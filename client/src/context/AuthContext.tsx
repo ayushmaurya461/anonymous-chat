@@ -1,20 +1,6 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
+import type { AuthCtx, User } from "../models/auth";
 
-export type User = {
-  id?: string;
-  name: string;
-  email?: string;
-  status?: string;
-  createdAt: string;
-  type: string;
-  uid: string;
-} | null;
-
-type AuthCtx = {
-  user: User;
-  setUser: (user: User) => void;
-  logout: () => Promise<void>;
-};
 
 const AuthContext = createContext<AuthCtx | undefined>(undefined);
 

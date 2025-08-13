@@ -14,17 +14,17 @@ import {
   Trash2,
   MessageCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { type Messages, type Room } from "../../context/ChatContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChat } from "../../hooks/use-chat";
 import { useAuth } from "../../hooks/use-auth";
+import type { Room, Messages } from "../../models/messages";
 
 export const Sidebar = () => {
   const [expandedChats, setExpandedChats] = useState(false);
   const [expandedRooms, setExpandedRooms] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { rooms, messages: directChats, setActiveChat, activeChat } = useChat();
+  const { rooms, messages: directChats, setActiveChat } = useChat();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -45,10 +45,6 @@ export const Sidebar = () => {
     setActiveChat(chat);
     navigate("/chat");
   };
-
-  useEffect(() => {
-    console.log(activeChat);
-  });
 
   return (
     <>
@@ -90,7 +86,7 @@ export const Sidebar = () => {
         <div className="p-4">
           <button
             onClick={() => toggleSection("rooms")}
-            className="w-full flex items-center justify-between text-white hover:text-white mb-3 transition-colors"
+            className="w-full flex items-center justify-between cursor-pointer text-white hover:text-white mb-3 transition-colors"
           >
             <div className="flex items-center space-x-2">
               <Users className="w-4 h-4" />
@@ -151,7 +147,7 @@ export const Sidebar = () => {
         <div className="p-4 border-t border-teal-700">
           <button
             onClick={() => toggleSection("chats")}
-            className="w-full flex items-center justify-between text-white hover:text-white mb-3 transition-colors"
+            className="w-full flex items-center justify-between cursor-pointer text-white hover:text-white mb-3 transition-colors"
           >
             <div className="flex items-center space-x-2">
               <MessageCircle className="w-4 h-4" />

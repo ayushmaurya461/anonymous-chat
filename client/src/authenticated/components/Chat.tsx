@@ -1,15 +1,31 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useChat } from "../../hooks/use-chat";
+import { getMessages } from "../../api/messages";
+import { useAuth } from "../../hooks/use-auth";
+import type { ReceivedMessage } from "../../models/messages";
 
 export const Chat = () => {
-  const { activeChat, sendMessage } = useChat();
+  const { activeChat, sendMessage, setActiveChat } = useChat();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [input, setInput] = useState("");
 
   useEffect(() => {
-    if (!activeChat) navigate("/");
-  });
+    if (activeChat) {
+      getMessages(
+        activeChat.type,
+        activeChat.id as string,
+        user?.id as string
+      ).then(({ data }) => {
+        if (JSON.stringify(data) !== JSON.stringify(activeChat.messages)) {
+          setActiveChat({ ...activeChat, messages: data });
+        }
+      });
+    } else {
+      navigate("/");
+    }
+  }, [activeChat, navigate, setActiveChat, user]);
 
   const handleSend = () => {
     if (input.trim() === "") return;
@@ -24,11 +40,20 @@ export const Chat = () => {
         <span className="font-bold text-xl">{activeChat?.name}</span>
       </header>
       <main className="absolute top-14 bottom-12 left-0 right-0 overflow-auto bg-gray-100">
-        <button>Hello </button>
         {/* Content here will scroll if needed */}
         <div className="p-4 space-y-4">
-          {Array.from({ length: 10 }, (_, i) => (
-            <p key={i}>Chat message {i + 1}</p>
+          {activeChat?.messages?.map((m: ReceivedMessage, index: number) => (
+            <div key={m?.id ?? index} className="flex w-full">
+              {activeChat?.id !== m.sender_id ? (
+                <div className="ml-auto bg-teal-800 p-2 rounded text-white">
+                  {m.content}
+                </div>
+              ) : (
+                <div className="mr-auto bg-gray-600 p-2 rounded text-white">
+                  {m.content}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </main>{" "}

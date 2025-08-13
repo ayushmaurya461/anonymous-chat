@@ -116,9 +116,20 @@ func (h *Hub) Run() {
 
 		case msg := <-h.Broadcast:
 			for client := range h.Clients {
-				if client.UserID == msg.ReceiverID || msg.RoomID == client.RoomID {
-					b, _ := json.Marshal(msg)
-					client.Send <- b
+				// Private message
+				if msg.ReceiverID != "" && msg.RoomID == "" {
+					if client.UserID == msg.ReceiverID || client.UserID == msg.SenderID {
+						b, _ := json.Marshal(msg)
+						client.Send <- b
+					}
+				}
+
+				// Room message
+				if msg.RoomID != "" && msg.ReceiverID == "" {
+					if client.RoomID == msg.RoomID {
+						b, _ := json.Marshal(msg)
+						client.Send <- b
+					}
 				}
 			}
 		}

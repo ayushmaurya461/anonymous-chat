@@ -3,8 +3,10 @@ package ws
 import (
 	"anonChat/db"
 	"anonChat/models"
+	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -27,11 +29,22 @@ func HandleWebSocket(hub *models.Hub, w http.ResponseWriter, r *http.Request) {
 
 	userID := r.URL.Query().Get("user_id")
 	if userID == "" {
-		http.Error(w, "Missing user_id", http.StatusBadRequest)
+		log.Println("Missing user_id, closing WS")
+		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Missing user_id"))
+		conn.Close()
 		return
 	}
-	username := db.GetUsernameByID(userID)
 
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	username := db.GetUsernameByID(ctx, userID)
+	if username == "" {
+		log.Println("No username found, closing WS")
+		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "User not found"))
+		conn.Close()
+		return
+	}
 	client := &models.Client{
 		ID:       uuid.New().String(),
 		UserID:   userID,

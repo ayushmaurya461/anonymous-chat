@@ -53,4 +53,6 @@ func main() {
 
 	g.Run(":8080")
 
+	defer db.Conn.Close()
+
 }

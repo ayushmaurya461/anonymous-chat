@@ -4,9 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { guestLogin, login } from "../../api/auth";
 import { useAuth } from "../../hooks/use-auth";
-import type { User } from "../../context/AuthContext";
-
-type Inputs = { username: string; password: string };
+import type { Inputs, User } from "../../models/auth";
 
 export const Login = () => {
   const {

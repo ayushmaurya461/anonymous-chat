@@ -7,33 +7,7 @@ import {
 } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { getUsers } from "../api/users";
-
-type Chat = {
-  id: string | number;
-  name: string;
-  unread: number;
-};
-
-export type Room = Chat & {
-  members: number;
-  isPrivate: boolean;
-};
-
-export type Messages = Chat & {
-  time: string;
-  online: boolean;
-  lastMessage: string;
-};
-
-type ChatContextType = {
-  rooms: Room[];
-  setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
-  messages: Messages[];
-  sendMessage: (content: string) => void;
-  setMessages: React.Dispatch<React.SetStateAction<Messages[]>>;
-  activeChat: Chat | null;
-  setActiveChat: (chat: Chat | null) => void;
-};
+import type { Room, Messages, Chat, ChatContextType } from "../models/messages";
 
 const ChatCtx = createContext<ChatContextType | undefined>(undefined);
 
@@ -43,8 +17,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const ws = useRef<WebSocket | null>(null);
   const auth = useAuth();
-
-  console.log(auth);
 
   useEffect(() => {
     if (!auth.user?.id) return;
@@ -58,12 +30,27 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     );
 
     ws.current.onopen = () => {
-      console.log("WebSocket connection established");
+      const handshake = {
+        type: "join",
+        content: "",
+        sender_id: auth.user?.id,
+        receiver_id: "",
+        room_id: "",
+        timestamp: Date.now(),
+      };
+
+      ws.current?.send(JSON.stringify(handshake));
     };
 
     ws.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      console.log("Received message:", message);
+      if (message.type === "message") {
+        setActiveChat((prev) =>
+          prev
+            ? { ...prev, messages: [...(prev.messages || []), message] }
+            : prev
+        );
+      }
     };
 
     ws.current.onclose = () => {
@@ -77,6 +64,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     return () => {
       if (ws.current) {
         ws.current.close();
+        ws.current = null;
       }
     };
   }, [auth.user?.id]);

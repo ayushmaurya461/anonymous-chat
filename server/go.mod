@@ -4,7 +4,11 @@ go 1.24.4
 
 require github.com/joho/godotenv v1.5.1
 
-require github.com/gorilla/websocket v1.5.3 // indirect
+require (
+	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	golang.org/x/sync v0.15.0 // indirect
+)
 
 require (
 	github.com/bytedance/sonic v1.13.3 // indirect
