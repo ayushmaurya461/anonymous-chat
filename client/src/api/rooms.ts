@@ -12,3 +12,8 @@ export const createRoom = async (
   });
   return data;
 };
+
+export const getRooms = async (user_id: string) => {
+  const { data } = await api.get(`/rooms/${user_id}`);
+  return data;
+};

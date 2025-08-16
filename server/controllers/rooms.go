@@ -107,3 +107,47 @@ func LeaveRoom(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Left room"})
 }
+
+func GetRooms(c *gin.Context) {
+	userID := c.Param("user_id")
+
+	userUUID, err := uuid.Parse(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse{Error: "Invalid user ID", Status: "error"})
+		return
+	}
+
+	query := `SELECT r.id, r.name FROM rooms r JOIN room_members rm ON r.id = rm.room_id WHERE rm.user_id = $1`
+
+	rows, err := db.Conn.Query(context.Background(), query, userUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Status: "error",
+			Error:  err.Error(),
+		})
+		return
+	}
+
+	defer rows.Close()
+
+	var rooms []models.Room
+
+	for rows.Next() {
+		var room models.Room
+		err := rows.Scan(&room.ID, &room.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.APIResponse{
+				Status: "error",
+				Error:  err.Error(),
+			})
+			return
+		}
+		rooms = append(rooms, room)
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Status: "success",
+		Data:   rooms,
+	})
+
+}

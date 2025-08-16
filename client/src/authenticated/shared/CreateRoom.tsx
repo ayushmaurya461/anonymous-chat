@@ -26,8 +26,8 @@ export const CreateRoom = ({ closeDialog }: { closeDialog: () => void }) => {
   };
 
   return (
-    <div className="backdrop-blur-md w-full h-screen absolute top-0 right-0 z-50 flex items-center justify-center">
-      <div className="p-8 bg-teal-100 rounded-2xl shadow-lg w-xs min-w-fit">
+    <div className="backdrop-blur-xl w-full h-screen absolute top-0 right-0 z-50 flex items-center justify-center">
+      <div className="p-8  rounded-3xl shadow-lg w-xs min-w-fit">
         <form onSubmit={handleSubmit(submit)}>
           <h3 className="font-bold text-2xl text-center mb-3">Create Room</h3>
 
@@ -69,7 +69,11 @@ export const CreateRoom = ({ closeDialog }: { closeDialog: () => void }) => {
             <Button variant="themed" disabled={isSubmitting}>
               Create Room
             </Button>
-            <Button variant="black" disabled={isSubmitting}>
+            <Button
+              variant="black"
+              disabled={isSubmitting}
+              onClick={closeDialog}
+            >
               Cancel
             </Button>
           </div>

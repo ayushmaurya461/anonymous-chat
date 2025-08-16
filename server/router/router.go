@@ -25,6 +25,7 @@ func SetupRoutes(g *gin.Engine, hub *models.Hub) {
 	})
 
 	rooms := g.Group("/rooms")
+	rooms.GET("/:user_id", controllers.GetRooms)
 	rooms.POST("/create", controllers.CreateRoom)
 	rooms.POST("/join", controllers.JoinRoom)
 	rooms.POST("/leave", controllers.LeaveRoom)

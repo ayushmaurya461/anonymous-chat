@@ -9,7 +9,7 @@ export type ReceivedMessage = {
 
 
 export type Chat = {
-  id: string | number;
+  id: string | undefined;
   name: string;
   unread: number;
   type: string;

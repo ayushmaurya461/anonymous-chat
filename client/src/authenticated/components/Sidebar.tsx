@@ -72,8 +72,9 @@ export const Sidebar = () => {
         updateMessages((prev) =>
           prev.map((m) => (m.id === chat.id ? { ...m, unread: 0 } : m))
         );
+      } else {
+        setActiveChat({ ...chat, unread: 0 });
       }
-
       navigate("/chat");
     },
     [activeChat, navigate, setActiveChat, updateMessages, user?.id]
@@ -107,14 +108,24 @@ export const Sidebar = () => {
           </span>
         )}
       </div>
-      <div className={`transform transition-transform duration-200 ${expanded ? 'rotate-0' : '-rotate-90'}`}>
+      <div
+        className={`transform transition-transform duration-200 ${
+          expanded ? "rotate-0" : "-rotate-90"
+        }`}
+      >
         <ChevronDown className="w-4 h-4 text-teal-200" />
       </div>
     </button>
   );
 
-  const totalUnreadRooms = filteredRooms.reduce((sum, room) => sum + (room.unread || 0), 0);
-  const totalUnreadChats = filteredChats.reduce((sum, chat) => sum + (chat.unread || 0), 0);
+  const totalUnreadRooms = filteredRooms.reduce(
+    (sum, room) => sum + (room.unread || 0),
+    0
+  );
+  const totalUnreadChats = filteredChats.reduce(
+    (sum, chat) => sum + (chat.unread || 0),
+    0
+  );
 
   return (
     <section className="flex flex-col h-full bg-gradient-to-br from-teal-800 via-teal-700 to-teal-800 relative overflow-hidden">
@@ -132,15 +143,25 @@ export const Sidebar = () => {
             <MessageSquareX className="text-teal-100 w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-teal-100 drop-shadow-sm">AnonChat</h3>
+            <h3 className="font-bold text-lg text-teal-100 drop-shadow-sm">
+              AnonChat
+            </h3>
             <p className="text-sm text-teal-200">Anonymous Chat</p>
           </div>
         </header>
 
         {/* Search */}
         <div className="px-6 mb-6">
-          <div className={`relative transition-all duration-300 ${searchFocused ? 'transform scale-105' : ''}`}>
-            <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${searchFocused ? 'text-teal-700' : 'text-teal-600'}`} />
+          <div
+            className={`relative transition-all duration-300 ${
+              searchFocused ? "transform scale-105" : ""
+            }`}
+          >
+            <Search
+              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${
+                searchFocused ? "text-teal-700" : "text-teal-600"
+              }`}
+            />
             <input
               type="text"
               placeholder="Search rooms or chats..."
@@ -164,14 +185,22 @@ export const Sidebar = () => {
               onToggle={() => toggleSection("rooms")}
               count={totalUnreadRooms}
             />
-            <div className={`transition-all duration-300 overflow-hidden ${expandedRooms ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div
+              className={`transition-all duration-300 overflow-hidden ${
+                expandedRooms ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
               {filteredRooms.length ? (
                 <div className="space-y-2">
                   {filteredRooms.map((room, index) => (
                     <div
                       key={room.id}
                       onClick={() => navigateTo(room)}
-                      className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer group transition-all duration-200 hover:bg-teal-600 hover:bg-opacity-40 hover:shadow-lg transform hover:-translate-y-0.5 ${activeChat?.id === room.id ? 'bg-teal-500 bg-opacity-40 shadow-lg' : 'hover:bg-teal-600'}`}
+                      className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer group transition-all duration-200 hover:bg-teal-600 hover:bg-opacity-40 hover:shadow-lg transform hover:-translate-y-0.5 ${
+                        activeChat?.id === room.id
+                          ? "bg-teal-500 bg-opacity-40 shadow-lg"
+                          : "hover:bg-teal-600"
+                      }`}
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className="flex-shrink-0">
@@ -237,14 +266,22 @@ export const Sidebar = () => {
               onToggle={() => toggleSection("chats")}
               count={totalUnreadChats}
             />
-            <div className={`transition-all duration-300 overflow-hidden ${expandedChats ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div
+              className={`transition-all duration-300 overflow-hidden ${
+                expandedChats ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
               {filteredChats.length ? (
                 <div className="space-y-2">
                   {filteredChats.map((chat, index) => (
                     <div
                       key={chat.id}
                       onClick={() => navigateTo(chat)}
-                      className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer group transition-all duration-200 hover:bg-teal-600 hover:bg-opacity-40 hover:shadow-lg transform hover:-translate-y-0.5 ${activeChat?.id === chat.id ? 'bg-teal-500 bg-opacity-40 shadow-lg' : ''}`}
+                      className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer group transition-all duration-200 hover:bg-teal-600 hover:bg-opacity-40 hover:shadow-lg transform hover:-translate-y-0.5 ${
+                        activeChat?.id === chat.id
+                          ? "bg-teal-500 bg-opacity-40 shadow-lg"
+                          : ""
+                      }`}
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className="relative flex-shrink-0">
@@ -304,7 +341,9 @@ export const Sidebar = () => {
               <User className="w-6 h-6 text-teal-900" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-teal-100 font-semibold text-sm truncate">{user?.name}</p>
+              <p className="text-teal-100 font-semibold text-sm truncate">
+                {user?.name}
+              </p>
               <p className="text-teal-200 text-xs">Online</p>
             </div>
             <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse flex-shrink-0" />

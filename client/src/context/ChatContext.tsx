@@ -3,6 +3,7 @@ import { useAuth } from "../hooks/use-auth";
 import { getUsers } from "../api/users";
 import type { Room, Messages, Chat, ChatContextType } from "../models/messages";
 import { useWebSocketChat } from "../hooks/use-websocket";
+import { getRooms } from "../api/rooms";
 
 const ChatCtx = createContext<ChatContextType | undefined>(undefined);
 
@@ -15,7 +16,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   // Restore active chat on mount
   useEffect(() => {
     const storedChat = sessionStorage.getItem("active_chat");
-    console.log("hello Stored", storedChat)
+    console.log("hello Stored", storedChat);
     if (storedChat) {
       try {
         const parsed = JSON.parse(storedChat);
@@ -39,7 +40,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     activeChat,
     setActiveChat,
     setMessages,
-    messages
+    messages,
   });
 
   // Fetch user list
@@ -47,7 +48,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     if (!auth.user?.id) return;
     getUsers(auth.user.id)
       .then(({ data }) => setMessages(data || []))
-      .catch(err => console.error("Error fetching users:", err));
+      .catch((err) => console.error("Error fetching users:", err));
+  }, [auth.user]);
+
+  useEffect(() => {
+    if (!auth.user?.id) return;
+    getRooms(auth.user.id)
+      .then(({ data }) => setRooms(data || []))
+      .catch((err) => console.error("Error fetching rooms:", err));
   }, [auth.user]);
 
   return (

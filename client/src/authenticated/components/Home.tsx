@@ -63,15 +63,15 @@ export const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-teal-500 to-green-400 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-20">
+      {/* <div className="absolute inset-0 opacity-20">
         <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
         <div className="absolute top-40 right-20 w-24 h-24 bg-white rounded-full blur-lg"></div>
         <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-white rounded-full blur-2xl"></div>
         <div className="absolute bottom-10 right-10 w-20 h-20 bg-white rounded-full blur-md"></div>
         <div className="absolute top-1/2 left-1/2 w-60 h-60 bg-white rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-      </div>
+      </div> */}
 
       {/* Floating particles */}
       <div className="absolute inset-0">
@@ -97,16 +97,16 @@ export const Home = () => {
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
               <div className="bg-white bg-opacity-20 backdrop-blur-md rounded-2xl p-4 shadow-xl">
-                <MessageCircle className="w-16 h-16 " />
+                <MessageCircle className="w-16 h-16 text-teal-900" />
               </div>
             </div>
-            <h1 className="text-6xl text-white font-bold  mb-4 drop-shadow-lg">
+            <h1 className="text-6xl text-teal-900 font-bold  mb-4 drop-shadow-lg">
               AnonChat
             </h1>
-            <p className="text-xl text-white text-opacity-90 mb-2">
+            <p className="text-xl text-teal-800 text-opacity-90 mb-2">
               Connect, Chat, Stay Anonymous
             </p>
-            <p className="text-lg text-white text-opacity-80 max-w-2xl mx-auto">
+            <p className="text-lg text-teal-800 text-opacity-80 max-w-2xl mx-auto">
               Join conversations without revealing your identity. Create rooms,
               find friends, or chat with strangers in a safe, anonymous
               environment.
