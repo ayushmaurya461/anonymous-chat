@@ -4,8 +4,12 @@ const BASE_URL = "http://localhost:8080";
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+  withCredentials: false,
   timeout: 10000,
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use(
@@ -48,3 +52,4 @@ export async function signup(
   });
   return data;
 }
+

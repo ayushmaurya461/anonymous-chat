@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import { Home } from "./components/Home";
 import { Rooms } from "./components/Rooms";
-import { Sidebar } from "./shared/Sidebar";
+import { Sidebar } from "./components/Sidebar";
 import { ChatProvider } from "../context/ChatContext";
-import { Chat } from "./components/Chat";
+import { ChatWindow } from "./components/Chat";
 
 export const Authenticated = () => {
   return (
@@ -16,8 +16,8 @@ export const Authenticated = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/rooms" element={  <Rooms />} />
-            <Route path="/chat" element={<Chat />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/chat" element={<ChatWindow />} />
           </Routes>
         </div>
       </div>

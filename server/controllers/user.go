@@ -182,15 +182,13 @@ func GetUser(g *gin.Context) {
 	id := g.Param("id")
 
 	var user models.User
-	query := `SELECT id, uid, name, email, type, status, created_at FROM users WHERE id = $1`
+	query := `SELECT id, uid, name, type, status FROM users WHERE id = $1`
 	err := db.Conn.QueryRow(context.Background(), query, id).Scan(
 		&user.ID,
 		&user.UID,
 		&user.Name,
-		&user.Email,
 		&user.Type,
 		&user.Status,
-		&user.CreatedAt,
 	)
 
 	if err != nil {
@@ -212,10 +210,26 @@ func GetUsers(g *gin.Context) {
 	id := g.Param("id")
 
 	var users []models.User
-	query := `SELECT id, uid, name, email, type, status, created_at 
-			  FROM users 
-			  WHERE id != $1
-			  ORDER BY created_at DESC`
+	query := `SELECT 
+				u.id,
+				u.uid,
+				u.name,
+				u.type,
+				u.status,
+				COALESCE(unread_count.count, 0) AS unread_messages
+			FROM users u
+			LEFT JOIN (
+				SELECT 
+					sender_id,
+					COUNT(*) AS count
+				FROM messages
+				WHERE receiver_id = $1
+				AND read = FALSE
+				GROUP BY sender_id
+			) unread_count
+			ON unread_count.sender_id = u.id
+			WHERE u.id != $1
+			ORDER BY u.created_at DESC;`
 
 	rows, err := db.Conn.Query(context.Background(), query, id)
 	if err != nil {
@@ -234,10 +248,9 @@ func GetUsers(g *gin.Context) {
 			&user.ID,
 			&user.UID,
 			&user.Name,
-			&user.Email,
 			&user.Type,
 			&user.Status,
-			&user.CreatedAt,
+			&user.UnreadMessages,
 		); err != nil {
 			g.JSON(http.StatusInternalServerError, models.APIResponse{
 				Status: "error",

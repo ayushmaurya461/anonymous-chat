@@ -99,3 +99,21 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 		Data:    messages,
 	})
 }
+
+func MarkAsRead(w http.ResponseWriter, r *http.Request) {
+	query := `UPDATE messages SET read = true WHERE receiver_id = $1 AND read = false`
+	_, err := db.Conn.Exec(context.Background(), query, r.URL.Query().Get("user_id"))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(models.APIResponse{
+			Status:  "error",
+			Message: "Failed to mark messages as read",
+		})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  "success",
+		Message: "Messages marked as read successfully",
+	})
+
+}

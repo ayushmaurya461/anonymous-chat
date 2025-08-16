@@ -48,7 +48,6 @@ export const Login = () => {
 
   async function loginAsGuest() {
     setSubmitError("");
-    console.log("Logging in as guest");
     try {
       const guest = await guestLogin();
       setUser(guest);

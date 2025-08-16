@@ -34,5 +34,5 @@ export type ChatContextType = {
   sendMessage: (content: string) => void;
   setMessages: React.Dispatch<React.SetStateAction<Messages[]>>;
   activeChat: Chat | null;
-  setActiveChat: (chat: Chat | null) => void;
+  setActiveChat: React.Dispatch<React.SetStateAction<Chat | null>>;
 };

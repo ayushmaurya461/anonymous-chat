@@ -19,6 +19,7 @@ type Message struct {
 	Content    string    `json:"content"`
 	Type       string    `json:"type"` // chat_message, notification, typing, etc.
 	CreatedAt  time.Time `json:"created_at"`
+	Read       bool      `json:"read"`
 }
 
 type WSMessage struct {
@@ -59,11 +60,13 @@ func (c *Client) Read(hub *Hub) {
 			break
 		}
 
-		log.Printf("Raw message from frontend: %s\n", string(raw))
-
 		var msg WSMessage
 		if err := json.Unmarshal(raw, &msg); err != nil {
 			log.Println("Invalid WSMessage format:", err)
+			continue
+		}
+
+		if msg.Content == "" {
 			continue
 		}
 
@@ -74,6 +77,7 @@ func (c *Client) Read(hub *Hub) {
 			RoomID:     msg.RoomID,
 			Content:    msg.Content,
 			Type:       msg.Type,
+			Read:       false,
 			CreatedAt:  time.Now(),
 		}
 
@@ -104,14 +108,14 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.Register:
 			h.Clients[client] = true
-			h.BroadcastUserLists()
-			log.Printf("Client registered: %s", client.ID)
+			// h.BroadcastUserLists()
+			// log.Printf("Client registered: %s", client.ID)
 
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)
 				close(client.Send)
-				log.Printf("Client unregistered: %s", client.ID)
+				// log.Printf("Client unregistered: %s", client.ID)
 			}
 
 		case msg := <-h.Broadcast:
