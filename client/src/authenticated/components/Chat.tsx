@@ -29,7 +29,7 @@ export const ChatWindow = () => {
         prev ? { ...prev, unread: 0 } : null
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChat?.id]);
 
   // fetch messages when chat changes
@@ -38,13 +38,13 @@ export const ChatWindow = () => {
       if (!sessionStorage.getItem("active_chat")) navigate("/");
       return;
     }
-
-    getMessages(activeChat.type, activeChat.id!, user!.id).then(({ data }) => {
+    const type = activeChat.type === "user" ? "user" : "room";
+    getMessages(type, activeChat.id!, user!.id, activeChat.id).then(({ data }) => {
       if (JSON.stringify(data) !== JSON.stringify(activeChat.messages)) {
         setActiveChat((prev) => (prev ? { ...prev, messages: data } : null));
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChat?.id, activeChat?.type]);
 
   const navigateToHome = () => {

@@ -1,7 +1,7 @@
 import {
   ChevronDown,
-  Hash,
-  MessageCirclePlus,
+  // Hash,
+  // MessageCirclePlus,
   MessageSquareX,
   Search,
   Users,
@@ -242,7 +242,7 @@ export const Sidebar = () => {
                   <div className="text-teal-100 text-sm mb-4 font-medium">
                     No rooms found.
                   </div>
-                  <div className="flex gap-3">
+                  {/* <div className="flex gap-3">
                     <button className="flex-1 bg-teal-500 hover:bg-teal-400 text-teal-900 flex items-center justify-center gap-2 rounded-xl p-3 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5 font-medium">
                       <MessageCirclePlus size={18} />
                       <span className="text-sm">Join</span>
@@ -251,7 +251,7 @@ export const Sidebar = () => {
                       <Hash size={18} />
                       <span className="text-sm">Create</span>
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               )}
             </div>

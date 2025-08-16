@@ -7,7 +7,7 @@ export function useWebSocketChat({
   activeChat,
   setActiveChat,
   setMessages,
-  messages
+  messages,
 }: {
   userId?: string;
   activeChat: Chat | null;
@@ -27,19 +27,27 @@ export function useWebSocketChat({
     ws.current = new WebSocket(`ws://localhost:8080/ws?user_id=${userId}`);
 
     ws.current.onopen = () => {
-      ws.current?.send(JSON.stringify({
-        type: "join",
-        content: "",
-        sender_id: userId,
-        receiver_id: "",
-        room_id: "",
-        timestamp: Date.now(),
-      }));
+      ws.current?.send(
+        JSON.stringify({
+          type: "join",
+          content: "",
+          sender_id: userId,
+          receiver_id: "",
+          room_id: "",
+          timestamp: Date.now(),
+        })
+      );
     };
 
     ws.current.onmessage = (event) => {
       const message: ReceivedMessage = JSON.parse(event.data);
-      filterChats({ message, activeChat, setActiveChat, setMessages, messages });
+      filterChats({
+        message,
+        activeChat,
+        setActiveChat,
+        setMessages,
+        messages,
+      });
     };
 
     ws.current.onclose = () => {
@@ -58,13 +66,16 @@ export function useWebSocketChat({
 
   const sendMessage = (content: string) => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
-    ws.current.send(JSON.stringify({
-      type: "message",
-      content,
-      timestamp: Date.now(),
-      receiver_id: activeChat?.id,
-      sender_id: userId,
-    }));
+    ws.current.send(
+      JSON.stringify({
+        type: "message",
+        content,
+        timestamp: Date.now(),
+        receiver_id: activeChat?.type === "user" ? activeChat?.id : "",
+        room_id: !(activeChat?.type === "user") ? activeChat?.id : "",
+        sender_id: userId,
+      })
+    );
   };
 
   return { sendMessage };

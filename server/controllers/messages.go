@@ -37,7 +37,7 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 	case "room":
 		roomID := r.URL.Query().Get("room_id")
 		rows, err = db.Conn.Query(context.Background(), `
-            SELECT id, sender_id, receiver_id, room_id, content, type, created_at
+            SELECT id, sender_id, room_id, content, type, created_at
             FROM messages
             WHERE room_id = $1
             ORDER BY created_at
@@ -69,24 +69,42 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 		var receiverID sql.NullString
 		var roomID sql.NullString
 
-		if err := rows.Scan(
-			&msg.ID,
-			&msg.SenderID,
-			&receiverID,
-			&roomID,
-			&msg.Content,
-			&msg.Type,
-			&msg.CreatedAt,
-		); err != nil {
-			log.Println("scan error:", err)
-			continue
-		}
+		switch queryType {
+		case "user":
+			if err := rows.Scan(
+				&msg.ID,
+				&msg.SenderID,
+				&receiverID,
+				&roomID,
+				&msg.Content,
+				&msg.Type,
+				&msg.CreatedAt,
+			); err != nil {
+				log.Println("scan error:", err)
+				continue
+			}
+			if receiverID.Valid {
+				msg.ReceiverID = receiverID.String
+			}
+			if roomID.Valid {
+				msg.RoomID = roomID.String
+			}
 
-		if receiverID.Valid {
-			msg.ReceiverID = receiverID.String
-		}
-		if roomID.Valid {
-			msg.RoomID = roomID.String
+		case "room":
+			if err := rows.Scan(
+				&msg.ID,
+				&msg.SenderID,
+				&roomID,
+				&msg.Content,
+				&msg.Type,
+				&msg.CreatedAt,
+			); err != nil {
+				log.Println("scan error:", err)
+				continue
+			}
+			if roomID.Valid {
+				msg.RoomID = roomID.String
+			}
 		}
 
 		messages = append(messages, msg)
