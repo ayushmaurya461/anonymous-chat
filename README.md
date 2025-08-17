@@ -2,7 +2,6 @@
 
 Meet **AnonChat**, a full‑stack, real‑time chat app where people can **chat anonymously**, meet strangers, and join **topic‑based rooms** to share opinions. Users can optionally **create an account** if they want to keep their 1:1 chats; **room chats are ephemeral and designed to be deleted after 24 hours** to encourage open conversation.
 
-> **Why this project is portfolio‑worthy:** modern Go backend with WebSockets, a responsive React + TypeScript frontend, clean API boundaries, and containerized Dev/Prod setup.
 
 ---
 
