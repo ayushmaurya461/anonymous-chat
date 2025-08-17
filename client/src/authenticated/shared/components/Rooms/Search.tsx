@@ -82,7 +82,7 @@ export const SearchBar = () => {
                 <div className="p-4 border-b border-gray-100">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-gray-800">
-                      Search Results ({searchResults.length})
+                      Search Results ({searchResults?.length})
                     </h3>
                     <button
                       onClick={closeSearchPopup}
@@ -93,7 +93,7 @@ export const SearchBar = () => {
                   </div>
                 </div>
 
-                {searchResults.length > 0 ? (
+                {searchResults?.length > 0 ? (
                   <div className="py-2">
                     {searchResults.map((room) => (
                       <button

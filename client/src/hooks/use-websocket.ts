@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { filterChats } from "../utils/chat";
 import type { Chat, Messages, ReceivedMessage, Room } from "../models/messages";
+import { getSocket } from "../utils/websocket";
 
 export function useWebSocketChat({
   userId,
@@ -28,7 +29,7 @@ export function useWebSocketChat({
       ws.current.close();
     }
 
-    ws.current = new WebSocket(`ws://localhost:8080/ws?user_id=${userId}`);
+    ws.current = getSocket(userId);
 
     ws.current.onopen = () => {
       ws.current?.send(
@@ -66,7 +67,6 @@ export function useWebSocketChat({
     };
 
     return () => {
-      ws.current?.close();
       ws.current = null;
     };
   }, [userId, activeChat, setActiveChat, setMessages]);
