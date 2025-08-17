@@ -1,10 +1,10 @@
-import { ArrowRight, MessageCircle, Plus, Search, X } from "lucide-react";
+import { ArrowRight, MessageCircle, Search, X } from "lucide-react";
 import { useState } from "react";
 import type { Room } from "../../../../models/messages";
 import { joinRoom, searchRooms } from "../../../../api/rooms";
 import { debounce } from "../../../../utils/functions";
-import { Button } from "../Button";
 import { useAuth } from "../../../../hooks/use-auth";
+import { Detailscard } from "../DetailsCard";
 
 const debouncedSearch = debounce(searchRooms, 500);
 
@@ -12,7 +12,8 @@ export const SearchBar = () => {
   const [showSearchPopup, setShowSearchPopup] = useState(false);
   const [searchResults, setSearchResults] = useState<Room[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showJoinPopup, setShowJoinPopup] = useState<Room | null>(null);
+  const [showJoinPopup, setShowJoinPopup] = useState<boolean>(false);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const { user } = useAuth();
 
   const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,13 +40,15 @@ export const SearchBar = () => {
   };
 
   const handleRoomSelect = (room: Room) => {
-    setShowJoinPopup(room);
+    setShowJoinPopup(true);
+    setSelectedRoom(room);
   };
 
   const joinelectedRoom = async () => {
     try {
-      await joinRoom(showJoinPopup?.id as string, user?.id as string);
-      setShowJoinPopup(null);
+      await joinRoom(selectedRoom?.id as string, user?.id as string);
+      setShowJoinPopup(false);
+      setSelectedRoom(null);
       setSearchResults([]);
       setSearchTerm("");
       setShowSearchPopup(false);
@@ -136,24 +139,11 @@ export const SearchBar = () => {
       </div>
 
       {showJoinPopup && (
-        <div className="absolute backdrop-blur-sm backdrop-brightness-75  flex justify-center items-center top-0 right-0 z-50 w-full h-full">
-          <div className="p-4 bg-white shadow-2xl rounded-xl">
-            <h2 className="text-2xl font-semibold mb-4 text-center text-teal-700">
-              {showJoinPopup.name}
-            </h2>
-            <p className="text-gray-600 mb-4 text-center">
-              {showJoinPopup.description}
-            </p>
-            <div className="flex gap-3">
-              <Button variant="themed" onClick={joinelectedRoom}>
-                <Plus /> Join Group
-              </Button>
-              <Button variant="black" onClick={() => setShowJoinPopup(null)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
+        <Detailscard
+          details={selectedRoom}
+          joinelectedRoom={joinelectedRoom}
+          setShowJoinPopup={setShowJoinPopup}
+        />
       )}
     </div>
   );

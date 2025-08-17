@@ -22,7 +22,7 @@ export function debounce<T extends (...args: any) => Promise<unknown>>(
     return new Promise((resolve, reject) => {
       timer = setTimeout(async () => {
         try {
-          const result = await fn(...args, signal);
+          const result = await fn(args[0], signal);
           resolve(result as ReturnType<T>);
         } catch (err) {
           if ((err as DOMException).name === "AbortError") {

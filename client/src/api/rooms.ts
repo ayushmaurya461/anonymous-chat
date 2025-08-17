@@ -3,12 +3,14 @@ import { api } from "./auth";
 export const createRoom = async (
   name: string,
   description: string,
-  id: string
+  id: string,
+  tags: string[]
 ) => {
   const { data } = await api.post("/rooms/create", {
     name: name,
     description: description,
     user_id: id,
+    tags: tags,
   });
   return data;
 };
@@ -18,8 +20,11 @@ export const getRooms = async (user_id: string) => {
   return data;
 };
 
-export const searchRooms = async (query: string) => {
-  const { data } = await api.get(`/rooms/search?query=${query}`);
+export const searchRooms = async (query: string, tags: string[] = []) => {
+  if (!Array.isArray(tags)) {
+    tags = [];
+  }
+  const { data } = await api.get(`/rooms/search?query=${query}&tags=${tags}`);
   return data;
 };
 

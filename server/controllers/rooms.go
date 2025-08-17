@@ -5,16 +5,19 @@ import (
 	"anonChat/models"
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func CreateRoom(c *gin.Context) {
 	var req struct {
-		Name        string `json:"name"`
-		UserID      string `json:"user_id"`
-		Description string `json:"description"`
+		Name        string   `json:"name"`
+		UserID      string   `json:"user_id"`
+		Tags        []string `json:"tags"`
+		Description string   `json:"description"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -30,8 +33,8 @@ func CreateRoom(c *gin.Context) {
 	}
 
 	_, err = db.Conn.Exec(context.Background(),
-		`INSERT INTO rooms (id, name, description, created_by) VALUES ($1, $2, $3, $4)`,
-		roomID, req.Name, req.Description, userUUID,
+		`INSERT INTO rooms (id, name, description, created_by, tags) VALUES ($1, $2, $3, $4, $5)`,
+		roomID, req.Name, req.Description, userUUID, req.Tags,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -154,8 +157,26 @@ func GetRooms(c *gin.Context) {
 
 func SearchRoom(c *gin.Context) {
 	name := c.Query("query")
-	query := `SELECT id, name, description, created_by FROM rooms WHERE name ILIKE '%' || $1 || '%';`
-	rows, err := db.Conn.Query(context.Background(), query, name)
+	tagsParam := c.Query("tags") // comma-separated tags
+
+	var query string
+	var rows pgx.Rows
+	var err error
+
+	if tagsParam != "" {
+		tags := strings.Split(tagsParam, ",") // []string
+		query = `SELECT id, name, description, created_by, tags
+                 FROM rooms
+                 WHERE name ILIKE '%' || $1 || '%'
+                 AND tags && $2::text[];`
+		rows, err = db.Conn.Query(context.Background(), query, name, tags)
+	} else {
+		query = `SELECT id, name, description, created_by, tags
+                 FROM rooms
+                 WHERE name ILIKE '%' || $1 || '%';`
+		rows, err = db.Conn.Query(context.Background(), query, name)
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.APIResponse{
 			Status: "error",
@@ -164,10 +185,11 @@ func SearchRoom(c *gin.Context) {
 		return
 	}
 	defer rows.Close()
+
 	var rooms []models.Room
 	for rows.Next() {
 		var room models.Room
-		err := rows.Scan(&room.ID, &room.Name, &room.Description, &room.CreatedBy)
+		err := rows.Scan(&room.ID, &room.Name, &room.Description, &room.CreatedBy, &room.Tags)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, models.APIResponse{
 				Status: "error",
@@ -175,7 +197,6 @@ func SearchRoom(c *gin.Context) {
 			})
 			return
 		}
-
 		rooms = append(rooms, room)
 	}
 
@@ -183,5 +204,4 @@ func SearchRoom(c *gin.Context) {
 		Status: "success",
 		Data:   rooms,
 	})
-
 }

@@ -3,7 +3,7 @@ import React from "react";
 interface Category {
   name: string;
   icon: React.ElementType;
-  count: number;
+  id: string;
 }
 
 interface CategoriesSidebarProps {
@@ -23,7 +23,7 @@ export const CategoriesSidebar = ({
       {categories.map((category) => (
         <button
           key={category.name}
-          onClick={() => setSelectedCategory(category.name)}
+          onClick={() => setSelectedCategory(category.id)}
           className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
             selectedCategory === category.name
               ? "bg-teal-50 text-teal-700 border border-teal-200"
@@ -34,9 +34,6 @@ export const CategoriesSidebar = ({
             <category.icon className="w-4 h-4" />
             <span className="text-sm font-medium">{category.name}</span>
           </div>
-          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-            {category.count}
-          </span>
         </button>
       ))}
     </div>
