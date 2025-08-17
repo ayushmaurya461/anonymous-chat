@@ -33,6 +33,7 @@ type WSMessage struct {
 
 type Hub struct {
 	Clients    map[*Client]bool
+	Rooms      map[string]map[*Client]bool
 	Broadcast  chan WSMessage
 	Register   chan *Client
 	Unregister chan *Client
@@ -48,6 +49,7 @@ type Client struct {
 }
 
 func (c *Client) Read(hub *Hub) {
+
 	defer func() {
 		hub.Unregister <- c
 		c.Conn.Close()
@@ -66,29 +68,99 @@ func (c *Client) Read(hub *Hub) {
 			continue
 		}
 
-		if msg.Content == "" {
-			continue
+		switch msg.Type {
+		case "join":
+			if msg.RoomID != "" {
+				c.RoomID = msg.RoomID
+
+				if hub.Rooms[msg.RoomID] == nil {
+					hub.Rooms[msg.RoomID] = make(map[*Client]bool)
+				}
+
+				hub.Rooms[msg.RoomID][c] = true
+				log.Printf("User %s joined room %s", c.UserID, msg.RoomID)
+
+				ack := WSMessage{
+					Type:    "system",
+					Content: "Joined",
+					RoomID:  msg.RoomID,
+				}
+				data, _ := json.Marshal(ack)
+
+				select {
+				case c.Send <- data:
+				default:
+					close(c.Send)
+					delete(hub.Clients, c)
+				}
+
+			}
+		case "message":
+			dbMsg := Message{
+				ID:         uuid.New(),
+				SenderID:   c.UserID,
+				ReceiverID: msg.ReceiverID,
+				RoomID:     msg.RoomID,
+				Content:    msg.Content,
+				Type:       msg.Type,
+				Read:       false,
+				CreatedAt:  time.Now(),
+			}
+
+			if err := SaveMessageToDB(dbMsg); err != nil {
+				log.Println("db save error:", err)
+			}
+
+			msg.SenderID = c.UserID
+			hub.Broadcast <- msg
+
+		default:
+			log.Println("Unknown message type:", msg.Type)
 		}
 
-		dbMsg := Message{
-			ID:         uuid.New(),
-			SenderID:   c.UserID,
-			ReceiverID: msg.ReceiverID,
-			RoomID:     msg.RoomID,
-			Content:    msg.Content,
-			Type:       msg.Type,
-			Read:       false,
-			CreatedAt:  time.Now(),
-		}
-
-		if err := SaveMessageToDB(dbMsg); err != nil {
-			log.Println("db save error:", err)
-		}
-
-		msg.SenderID = c.UserID
-
-		hub.Broadcast <- msg
 	}
+
+	// defer func() {
+	// 	hub.Unregister <- c
+	// 	c.Conn.Close()
+	// }()
+
+	// for {
+	// 	_, raw, err := c.Conn.ReadMessage()
+	// 	if err != nil {
+	// 		log.Println("Error reading message:", err)
+	// 		break
+	// 	}
+
+	// 	var msg WSMessage
+	// 	if err := json.Unmarshal(raw, &msg); err != nil {
+	// 		log.Println("Invalid WSMessage format:", err)
+	// 		continue
+	// 	}
+
+	// 	if msg.Content == "" {
+	// 		continue
+	// 	}
+
+	// 	dbMsg := Message{
+	// 		ID:         uuid.New(),
+	// 		SenderID:   c.UserID,
+	// 		ReceiverID: msg.ReceiverID,
+	// 		RoomID:     msg.RoomID,
+	// 		Content:    msg.Content,
+	// 		Type:       msg.Type,
+	// 		Read:       false,
+	// 		CreatedAt:  time.Now(),
+	// 	}
+
+	// 	if err := SaveMessageToDB(dbMsg); err != nil {
+	// 		log.Println("db save error:", err)
+	// 	}
+
+	// 	msg.SenderID = c.UserID
+
+	// 	hub.Broadcast <- msg
+	// }
 }
 
 func (c *Client) Write() {
@@ -109,18 +181,15 @@ func (h *Hub) Run() {
 		case client := <-h.Register:
 			h.Clients[client] = true
 			// h.BroadcastUserLists()
-			// log.Printf("Client registered: %s", client.ID)
 
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)
 				close(client.Send)
-				// log.Printf("Client unregistered: %s", client.ID)
 			}
 
 		case msg := <-h.Broadcast:
 			for client := range h.Clients {
-				// Private message
 				if msg.ReceiverID != "" && msg.RoomID == "" {
 					if client.UserID == msg.ReceiverID || client.UserID == msg.SenderID {
 						b, _ := json.Marshal(msg)
@@ -128,8 +197,8 @@ func (h *Hub) Run() {
 					}
 				}
 
-				// Room message
 				if msg.RoomID != "" && msg.ReceiverID == "" {
+					log.Println(msg.RoomID, "-------", client.RoomID)
 					if client.RoomID == msg.RoomID {
 						b, _ := json.Marshal(msg)
 						client.Send <- b

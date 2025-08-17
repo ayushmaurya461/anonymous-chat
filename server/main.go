@@ -19,7 +19,7 @@ func init() {
 
 func main() {
 	g := gin.Default()
-	g.Use(gin.Logger())
+	// g.Use(gin.Logger())
 	g.Use(gin.Recovery())
 	g.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
@@ -42,6 +42,7 @@ func main() {
 
 	hub := &models.Hub{
 		Clients:    make(map[*models.Client]bool),
+		Rooms:      make(map[string]map[*models.Client]bool),
 		Broadcast:  make(chan models.WSMessage),
 		Register:   make(chan *models.Client),
 		Unregister: make(chan *models.Client),

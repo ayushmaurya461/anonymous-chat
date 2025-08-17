@@ -16,7 +16,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   // Restore active chat on mount
   useEffect(() => {
     const storedChat = sessionStorage.getItem("active_chat");
-    console.log("hello Stored", storedChat);
     if (storedChat) {
       try {
         const parsed = JSON.parse(storedChat);
@@ -41,6 +40,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setActiveChat,
     setMessages,
     messages,
+    rooms,
+    setRooms
   });
 
   // Fetch user list

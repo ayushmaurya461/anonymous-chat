@@ -4,6 +4,7 @@ export type ReceivedMessage = {
   id: string;
   receiver_id: string;
   sender_id: string;
+  room_id: string;
   type: string;
 };
 
@@ -19,6 +20,8 @@ export type Chat = {
 export type Room = Chat & {
   members: number;
   isPrivate: boolean;
+  description: string;
+  tags: string[]
 };
 
 export type Messages = Chat & {

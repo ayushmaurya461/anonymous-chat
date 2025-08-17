@@ -12,11 +12,13 @@ import { CreateRoom } from "../shared/CreateRoom";
 import { Button } from "../shared/components/Button";
 import { FeatureCard } from "../shared/components/Card";
 import { ActionCard } from "../shared/components/ActionCard";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [showCreateRoom, setShowCreateRoom] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearchUser = () => {
     if (searchQuery.trim()) {
@@ -63,34 +65,7 @@ export const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br relative overflow-hidden">
-      {/* Background decorative elements */}
-      {/* <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-white rounded-full blur-lg"></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-white rounded-full blur-2xl"></div>
-        <div className="absolute bottom-10 right-10 w-20 h-20 bg-white rounded-full blur-md"></div>
-        <div className="absolute top-1/2 left-1/2 w-60 h-60 bg-white rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-      </div> */}
-
-      {/* Floating particles */}
-      <div className="absolute inset-0">
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute bg-white rounded-full opacity-30 animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 8 + 4}px`,
-              height: `${Math.random() * 8 + 4}px`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${Math.random() * 2 + 2}s`,
-            }}
-          ></div>
-        ))}
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br bg-teal-50 relative overflow-hidden">
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-4xl">
           {/* Header */}
@@ -161,6 +136,9 @@ export const Home = () => {
             <Button variant="themed" onClick={handleRandomChat}>
               <MessageCircle className="w-5 h-5" />
               Chat with Stranger
+            </Button>
+            <Button variant="themed" onClick={() => navigate("/rooms")}>
+              <Users /> Explore Rooms
             </Button>
           </div>
 

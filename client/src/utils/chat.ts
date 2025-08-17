@@ -1,21 +1,28 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { Chat, Messages, ReceivedMessage } from "../models/messages";
+import type { Chat, Messages, ReceivedMessage, Room } from "../models/messages";
+
+type Props = {
+  message: ReceivedMessage;
+  setActiveChat: Dispatch<SetStateAction<Chat | null>>;
+  setMessages: Dispatch<SetStateAction<Messages[]>>;
+  activeChat: Chat | null;
+  messages: Messages[];
+  rooms: Room[];
+  setRooms: Dispatch<SetStateAction<Room[]>>;
+};
 
 export const filterChats = ({
   message,
   setActiveChat,
   activeChat,
   setMessages,
-  messages
-}: {
-  message: ReceivedMessage;
-  setActiveChat: Dispatch<SetStateAction<Chat | null>>;
-  setMessages: Dispatch<SetStateAction<Messages[]>>;
-  activeChat: Chat | null;
-  messages: Messages[];
-}) => {
+  messages,
+  setRooms,
+}: Props) => {
   if (
-    [message.sender_id, message.receiver_id].includes(activeChat?.id as string)
+    [message.sender_id, message.receiver_id, message.room_id].includes(
+      activeChat?.id as string
+    )
   ) {
     if (message.type === "message") {
       console.log(message);
@@ -32,17 +39,32 @@ export const filterChats = ({
       return [...prev, ...newMessages];
     });
   } else {
-    setMessages((prev) => {
-      const updatedMessages = prev.map((chat) => {
-        if (chat.id === message.sender_id) {
-          return {
-            ...chat,
-            unread: chat.unread ? chat.unread + 1 : 1,
-          };
-        }
-        return chat;
+    if (message.room_id) {
+      setRooms((prev) => {
+        const updatedMessages = prev.map((chat) => {
+          if (chat.id === message.sender_id) {
+            return {
+              ...chat,
+              unread: chat.unread ? chat.unread + 1 : 1,
+            };
+          }
+          return chat;
+        });
+        return updatedMessages;
       });
-      return updatedMessages;
-    });
+    } else {
+      setMessages((prev) => {
+        const updatedMessages = prev.map((chat) => {
+          if (chat.id === message.sender_id) {
+            return {
+              ...chat,
+              unread: chat.unread ? chat.unread + 1 : 1,
+            };
+          }
+          return chat;
+        });
+        return updatedMessages;
+      });
+    }
   }
 };

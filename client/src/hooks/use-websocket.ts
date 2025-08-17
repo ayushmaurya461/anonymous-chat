@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { filterChats } from "../utils/chat";
-import type { Chat, Messages, ReceivedMessage } from "../models/messages";
+import type { Chat, Messages, ReceivedMessage, Room } from "../models/messages";
 
 export function useWebSocketChat({
   userId,
@@ -8,12 +8,16 @@ export function useWebSocketChat({
   setActiveChat,
   setMessages,
   messages,
+  rooms,
+  setRooms,
 }: {
   userId?: string;
   activeChat: Chat | null;
   setActiveChat: React.Dispatch<React.SetStateAction<Chat | null>>;
   setMessages: React.Dispatch<React.SetStateAction<Messages[]>>;
   messages: Messages[];
+  rooms: Room[];
+  setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
 }) {
   const ws = useRef<WebSocket | null>(null);
 
@@ -33,7 +37,7 @@ export function useWebSocketChat({
           content: "",
           sender_id: userId,
           receiver_id: "",
-          room_id: "",
+          room_id: activeChat?.id || "",
           timestamp: Date.now(),
         })
       );
@@ -41,12 +45,15 @@ export function useWebSocketChat({
 
     ws.current.onmessage = (event) => {
       const message: ReceivedMessage = JSON.parse(event.data);
+      console.log("Received message:", message);
       filterChats({
         message,
         activeChat,
         setActiveChat,
         setMessages,
         messages,
+        rooms,
+        setRooms,
       });
     };
 

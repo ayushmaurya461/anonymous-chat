@@ -151,3 +151,37 @@ func GetRooms(c *gin.Context) {
 	})
 
 }
+
+func SearchRoom(c *gin.Context) {
+	name := c.Query("query")
+	query := `SELECT id, name, description, created_by FROM rooms WHERE name ILIKE '%' || $1 || '%';`
+	rows, err := db.Conn.Query(context.Background(), query, name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Status: "error",
+			Error:  err.Error(),
+		})
+		return
+	}
+	defer rows.Close()
+	var rooms []models.Room
+	for rows.Next() {
+		var room models.Room
+		err := rows.Scan(&room.ID, &room.Name, &room.Description, &room.CreatedBy)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.APIResponse{
+				Status: "error",
+				Error:  err.Error(),
+			})
+			return
+		}
+
+		rooms = append(rooms, room)
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Status: "success",
+		Data:   rooms,
+	})
+
+}

@@ -4,6 +4,7 @@ import (
 	"anonChat/db"
 	"anonChat/models"
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -39,6 +40,9 @@ func HandleWebSocket(hub *models.Hub, w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	username := db.GetUsernameByID(ctx, userID)
+	roomID := r.URL.Query().Get("room_id")
+
+	fmt.Println("Username:", username, r.URL.Query())
 	if username == "" {
 		log.Println("No username found, closing WS")
 		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "User not found"))
@@ -51,7 +55,7 @@ func HandleWebSocket(hub *models.Hub, w http.ResponseWriter, r *http.Request) {
 		UserName: username,
 		Conn:     conn,
 		Send:     make(chan []byte, 256),
-		RoomID:   "",
+		RoomID:   roomID,
 	}
 
 	hub.Register <- client
