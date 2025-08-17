@@ -254,17 +254,3 @@ You can schedule this via:
 - CI/CD with GitHub Actions
 - Infra as code (Terraform) for cloud deploy
 
----
-
-## 📸 Screenshots (optional)
-
-Add a few screenshots of:
-1) **Rooms list**  
-2) **Chat window with messages**  
-3) **Anonymous (guest) entry screen**
-
----
-
-## 📄 License
-
-MIT — free to use and modify.
