@@ -224,33 +224,3 @@ DELETE FROM messages
 WHERE room_id IS NOT NULL
   AND created_at < NOW() - INTERVAL '24 hours';
 ```
-
-You can schedule this via:
-- **pg_cron** (PostgreSQL extension)
-- a simple **cron** job that runs `psql -c "<above SQL>"`
-- a lightweight background worker/service
-
-> Direct‑message (1:1) retention can be configured separately according to your policy.
-
----
-
-## 🧪 Notes for Reviewers (Recruiter‑friendly)
-
-- Real‑time experience: typed messages appear instantly for connected peers.
-- Clean separation of concerns (router/controllers/models) on the backend.
-- Idiomatic React with hooks and Context on the frontend.
-- Clear, minimal API surface; easy to extend (e.g., attachments, presence).
-- Dockerized dev loop with hot reload for Go.
-
----
-
-## 🛣️ Roadmap / Ideas
-
-- JWT auth & refresh tokens
-- Presence & typing indicators
-- File sharing & media messages
-- Social sign‑in (Google/GitHub)
-- Moderation tools (report, ban, rate‑limits)
-- CI/CD with GitHub Actions
-- Infra as code (Terraform) for cloud deploy
-
